@@ -1,10 +1,10 @@
 [Unit]
-Description=Infosec ACEP Website
+Description=RvB Scoreboard Website
 After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/var/www/infosec-acep-uaf-edu-website
+WorkingDirectory=/var/www/leaderboard-acep-uaf-edu-website
 ExecStart=/usr/bin/npm start
 Restart=always
 RestartSec=10
