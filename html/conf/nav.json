@@ -9,13 +9,13 @@
       "title": "Historical Scores",
       "icon": "fa-solid fa-history",
       "page": "pastscores",
-      "enabled": true
+      "enabled": false
     },
     {
       "title": "API",
       "icon": "fa-solid fa-code",
       "page": "api",
-      "enabled": true
+      "enabled": false
     }
 ]
   
