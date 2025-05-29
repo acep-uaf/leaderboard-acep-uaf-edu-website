@@ -1,4 +1,13 @@
-# ACEP InfoSec Website
+#  Scoreboard
 
-This is a UAF internal website of the Alaska Center for Energy and Power (ACEP) for Information Security related content.
+## Scoreboard Selection
 
+<div id="selectboard"></div>
+
+## Competition Overview
+
+<div id="overview"></div>
+
+## Current Standings
+
+<div id="scores"></div>

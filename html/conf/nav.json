@@ -1,8 +1,14 @@
 [
     {
-      "title": "Home",
-      "icon": "fa-solid fa-house",
+      "title": "Scoreboard",
+      "icon": "fa-solid fa-trophy",
       "page": "index",
+      "enabled": true
+    },
+    {
+      "title": "Historical Scores",
+      "icon": "fa-solid fa-history",
+      "page": "pastscores",
       "enabled": true
     },
     {
@@ -11,5 +17,5 @@
       "page": "api",
       "enabled": true
     }
-  ]
+]
   

@@ -27,6 +27,20 @@ log('WEBAPI: ' + JSON.stringify(config, null, 2));
 
 // API
 
+// List Boards
+app.get('/api/boards', (req, res) => {
+  res.json(ailib.list_boards());
+
+  let webreqmeta = {
+    method: req.method,
+    url: req.originalUrl,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  };
+
+  log('WEBAPI: ' + JSON.stringify(webreqmeta))
+})
+
 // Serve config as JSON
 app.get('/api/config', (req, res) => {
     res.json(config);

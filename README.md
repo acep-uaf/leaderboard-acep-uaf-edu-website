@@ -1,15 +1,14 @@
-# infosec-acep-uaf-edu-website
-ACEP InfoSec Website
-- infosec.acep.uaf.edu
+# leaderboard-acep-uaf-edu-website
+ACEP Red Vs Blue Leaderboard Website
 
 # Installation
 
 ```
-git clone https://github.com/acep-uaf/infosec-acep-uaf-edu-website.git
+git clone https://github.com/acep-uaf/leaderboard-acep-uaf-edu-website
 ```
 
 ```
-cd infosec-acep-uaf-edu-website
+cd leaderboard-acep-uaf-edu-website
 ```
 
 ```
@@ -23,4 +22,4 @@ npm start
 ```
 
 Point your browser to:
-- http://127.0.0.1:8080/
+- http://127.0.0.1:8081/
