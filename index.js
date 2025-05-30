@@ -186,7 +186,7 @@ client.on('message', (topic, messageBuffer) => {
       return;
     }
 
-    const filePath = path.join(config.dirs.data, `message.${message.NAME}.json`);
+    const filePath = path.join(config.dirs.data, `${message.NAME}.json`);
     try {
       fs.writeFileSync(filePath, JSON.stringify(message, null, 2));
       log(`Saved message to ${filePath}`);
