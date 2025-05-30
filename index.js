@@ -10,6 +10,7 @@ import fs from 'fs';
 import path, { parse } from 'path';
 import { fileURLToPath } from 'url';
 import ailib, { load_config, log, logStaticRequests } from './libs/acep-infosec-web-lib.js';
+import mqtt from 'mqtt';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -153,3 +154,51 @@ for (const ip of config.host.ips) {
       log(`INFO: WebUI started on ${ip}:${config.web.port}`);
     });
   }
+
+
+// Start MQTT Subscriber to listen for leaderboard updates
+// MQTT connection
+const mqttUrl = `mqtt://${config.mqtt.host}:${config.mqtt.port}`;
+const client = mqtt.connect(mqttUrl, {
+  clientId: `sub-${Math.random().toString(16).substr(2, 8)}`,
+  clean: true
+});
+
+// Handle connection
+client.on('connect', () => {
+  log(`Connected to MQTT broker at ${mqttUrl}`);
+  client.subscribe(config.mqtt.topic, { qos: 1 }, (err) => {
+    if (err) {
+      log(`Subscription error: ${err.message}`, true);
+    } else {
+      log(`Subscribed to topic "${config.mqtt.topic}"`);
+    }
+  });
+});
+
+// Handle incoming messages
+client.on('message', (topic, messageBuffer) => {
+  try {
+    const message = JSON.parse(messageBuffer.toString());
+
+    if (!message.NAME) {
+      log("Received message missing 'NAME' field:" + message, true);
+      return;
+    }
+
+    const filePath = path.join(config.dirs.data, `message.${message.NAME}.json`);
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(message, null, 2));
+      log(`Saved message to ${filePath}`);
+    } catch (err) {
+      log(`Error saving message to ${filePath}: ${err.message}`, true);  
+    }
+  } catch (err) {
+    log("Error handling message:" + err.message, true);
+  }
+});
+
+// Handle errors
+client.on('error', (err) => {
+  log(`MQTT client error: ${err.message}`, true);
+});

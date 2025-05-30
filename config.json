@@ -7,5 +7,10 @@
     },
     "web": {
         "port": 8081
+    },
+    "mqtt": {
+        "host": "infosec.acep.uaf.edu",
+        "port": 1883,
+        "topic": "leaderboard"
     }
 }
