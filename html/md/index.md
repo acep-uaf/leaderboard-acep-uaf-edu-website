@@ -1,20 +1,20 @@
-#  Scoreboard
 
----
-
-## Scoreboard Selection
+## Board Selection
 
 <div id="selectboard"></div>
 
 ---
 
-## Competition Overview
-
-<div id="overview"></div>
+<div class="container">
+    <div class="row">
+        <div id="overview" class="col-md-6"></div>
+        <div id="roles" class="col-md-6"></div>
+    </div>
+</div>
 
 ---
 
-## Current Standings
+## Scoreboard
 
 <div id="scores"></div>
 

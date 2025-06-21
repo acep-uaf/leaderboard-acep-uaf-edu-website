@@ -146,20 +146,7 @@ function list_boards() {
         let compdata = JSON.parse(fs.readFileSync(path.join(config.dirs.data, comp_files[f]), 'utf8'));
 
         if (compdata.ENABLED) {
-          comp[compdata.NAME] = {}
-          comp[compdata.NAME]['name'] = compdata.NAME
-          comp[compdata.NAME]['title'] = compdata.TITLE
-          comp[compdata.NAME]['desc'] = compdata.DESCRIPTION
-          comp[compdata.NAME]['start'] = compdata.START
-          comp[compdata.NAME]['end'] = compdata.END
-          comp[compdata.NAME]['status'] = compdata.STATUS
-          comp[compdata.NAME]['enabled'] = compdata.ENABLED
-          comp[compdata.NAME]['total_points'] = compdata.TOTAL_POINTS
-          comp[compdata.NAME]['assigned_points'] = compdata.ASSIGNED_POINTS
-          comp[compdata.NAME]['awarded_points'] = compdata.AWARDED_POINTS 
-          comp[compdata.NAME]['people'] = compdata.people
-          comp[compdata.NAME]['roles'] = compdata.roles
-          comp[compdata.NAME]['stacks'] = compdata.stacks            
+          comp[compdata.NAME] = compdata          
         }
 
       } catch (err) {

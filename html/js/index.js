@@ -13,7 +13,7 @@ fetch('/api/boards')
         let select_html = '';
         select_html += '<select id="boardselection" onchange="updateScoreboard()">';
         for (let board in boardmetadata) {
-            select_html += `<option value="${board}">${boardmetadata[board].title}</option>`;
+            select_html += `<option value="${board}">${boardmetadata[board].DESCRIPTION}</option>`;
         }
         select_html += '</select>';
         document.getElementById('selectboard').innerHTML = select_html;
@@ -34,24 +34,26 @@ fetch('/api/boards')
         // Show Competition Overview
 
         // Set overview div width
-        document.getElementById('overview').style.width = '500px';
+        // document.getElementById('overview').style.width = '500px';
+        // document.getElementById('roles').style.width = '500px';
 
         // let board = document.getElementById('boardselection').value;
 
         let meta_fields = {
-                            'name': 'Board ID', 
-                            'title': 'Board Name', 
-                            'start': 'Start Time',
-                            'end': 'End Time',
-                            'status': 'Status',
-                            'total_points': 'Total Points',
-                            'assigned_points': 'Assigned Points',
-                            'awarded_points': 'Awarded Points'
+                            'DESCRIPTION': 'Board Name', 
+                            'NAME': 'Board ID', 
+                            'START': 'Start Time',
+                            'END': 'End Time',
+                            'STATUS': 'Status'
+                            // 'total_points': 'Total Points',
+                            // 'assigned_points': 'Assigned Points',
+                            // 'awarded_points': 'Awarded Points'
                         };
 
         let overview_html = '';
 
         // Bootstrap Table
+        overview_html += '<h3>Competition Overview</h3>';
         overview_html += '<table class="table table-striped table-hover table-sm">';
         for (let f in meta_fields) {
             overview_html += `<tr><td style="font-weight: bold;"">${meta_fields[f]}</td><td>${boardmetadata[board][f]}</td></tr>`;
@@ -59,107 +61,177 @@ fetch('/api/boards')
         overview_html += '</table>';
         document.getElementById('overview').innerHTML = overview_html;
 
-        // Show Current Standings
+        // People and Roles
+        // People | Role | Team
+        let role_html = '';
+        // Bootstrap Table
+        role_html += '<h3>People and Roles</h3>';
+        role_html += '<table class="table table-striped table-hover table-sm">';
 
-        // Score Fields (Columns)
-        let score_fields = {
-            'player': 'Player'
-        };
-        // console.log(Object.keys(boardmetadata[board].stacks));
-        for (s in boardmetadata[board].stacks) {
-            score_fields[s.toLowerCase()] = s
-        }
-        // score_fields['total'] = 'Total';
-        // console.log(JSON.stringify(score_fields, null, 2));
-
-        // Players
-        // let players = Object.keys(boardmetadata[board].roles.players);
-        let players = Object.values(boardmetadata[board].roles.players);        
-        players.push('total');
-        // console.log(JSON.stringify(players, null, 2));
-
-        // Generate Scores
-        let scoreboard = {};
-
-        for (let s in boardmetadata[board].stacks) {
-            for (let p in players) {
-                if (players[p] != 'total') {
-                    // console.log('DEBUG: board: ' + board + ', player: ' + players[p] + ', stack: ' + s);
-                    // console.log('DEBUG: points: ' + boardmetadata[board].stacks[s].points_assigned[players[p]]);
-                    const points = boardmetadata[board].stacks[s].points_assigned[players[p]];
-
-                    // Totals
-                    if (scoreboard.hasOwnProperty('Total') == false) {
-                        scoreboard['Total'] = {};
-                    }
-    
-                    // Total Points
-                    if (scoreboard['Total'].hasOwnProperty(s) == false) {
-                        scoreboard['Total'][s] = 0;
-                    }
-    
-                    // Player
-                    if (scoreboard.hasOwnProperty(boardmetadata[board].people[ players[p] ].NAME) == false) {
-                        // scoreboard[players[p]] = {};
-                        scoreboard[ boardmetadata[board].people[ players[p] ].NAME ] = {};
-                    }
-    
-                    // Player Points
-                    // scoreboard[players[p]][s] = points;    
-                    scoreboard[ boardmetadata[board].people[ players[p] ].NAME ][s] = points;
-                }
+        // console.log(JSON.stringify(boardmetadata[board].PEOPLE, null, 2));
+        for (let p in boardmetadata[board].PEOPLE) {
+            if (! boardmetadata[board].PEOPLE[p].hasOwnProperty('ROLE')) {
+                boardmetadata[board].PEOPLE[p]['ROLE'] = 'Moderator';
             }
-            scoreboard['Total'][s] += boardmetadata[board].stacks[s].points_total;
+
+            if (! boardmetadata[board].PEOPLE[p].hasOwnProperty('TEAM')) {
+                boardmetadata[board].PEOPLE[p]['TEAM'] = '';
+            }
+
+            let team_color = '#000';
+            if (boardmetadata[board].PEOPLE[p].hasOwnProperty('TEAM_ID')) {
+                team_color = '#' + boardmetadata[board].TEAMS[ boardmetadata[board].PEOPLE[p].TEAM_ID ].COLOR;
+            } else {
+                team_color = '#909';
+            }
+
+            role_html += `<tr><td>${boardmetadata[board].PEOPLE[p].NAME}</td><td><span style="color: ${team_color};">${boardmetadata[board].PEOPLE[p].ROLE}</span></td><td><span style="color: ${team_color};">${boardmetadata[board].PEOPLE[p].TEAM}</span></td></tr>`
         }
-        // console.log(JSON.stringify(scoreboard, null, 2)); 
+
+        role_html += '</table>';
+        document.getElementById('roles').innerHTML = role_html;
     
         let scores_html = '';
-        scores_html += '<h3 style="color: rgb(13 110,253);">' + boardmetadata[board].title + '</h3>';
+        scores_html += '<h3 style="color: rgb(13 110,253);">' + boardmetadata[board].DESCRIPTION + '</h3>';
+
+
+        // Score Totals
+        scores_html += '<h4>Totals</h4>';
         scores_html += '<table class="table table-striped table-hover table-sm">';
     
         // Header Row
         scores_html += '<tr>';
-        for (let s in score_fields) {
-            scores_html += `<th>${score_fields[s]}</th>`;
+        scores_html += '<th>Team</th>';
+        for (let col in boardmetadata[board].STACKSLIST) {
+            scores_html += `<th>${boardmetadata[board].STACKSLIST[col]}</th>`;
         }
         scores_html += '</tr>';
-    
-        // Player Rows
-        for (let p in players) {
-            // console.log(JSON.stringify(scoreboard[players[p]], null, 2));
-            // console.log("DEBUG: Player: " + players[p]);
-            // console.log(JSON.stringify(boardmetadata[board].people, null, 2));
-            // console.log(JSON.stringify(boardmetadata[board].people[ players[p] ], null, 2));
-            let player = 'Total';
-            if (players[p] != 'total') {
-                player = boardmetadata[board].people[ players[p] ].NAME;
-            }
-            // console.log("DEBUG: Player: " + player);
 
-            scores_html += '<tr>';
-            switch (player) {
-                case 'Total':
-                    scores_html += `<td style="font-weight: bold; color: rgb(13 110,253);">${player}</td>`;
-                    break;
-                default:
-                    scores_html += `<td>${player}</td>`;
-                    break;
-            }
-
-            for (let s in scoreboard[player]) {
-                switch (player) {
-                    case 'Total':
-                        scores_html += `<td style="font-weight: bold; color: rgb(13 110,253);">${scoreboard[player][s]}</td>`;
-                        break;
-                    default:
-                        scores_html += `<td>${scoreboard[player][s]}</td>`;
-                        break;
+        // Convert Scores to Table Date
+        let score_table = {};
+        for (let stack in boardmetadata[board].SCORES.TEAMS.SUMMARY) {
+            for (let team in boardmetadata[board].SCORES.TEAMS.SUMMARY[stack]) {
+                let teamname = "<span style=\"color: #" + boardmetadata[board].TEAMS[ team ].COLOR + ";\">" + boardmetadata[board].TEAMS[ team ].NAME + "</span>";
+                if (!score_table[teamname]) {
+                    score_table[teamname] = {};
                 }
+                score_table[teamname][stack] = boardmetadata[board].SCORES.TEAMS.SUMMARY[stack][team];
+            }
+        }
+
+        for (let rows in score_table) {
+            scores_html += '<tr>';
+            scores_html += `<td>${rows}</td>`;
+            for (let col in boardmetadata[board].STACKSLIST) {
+                scores_html += `<td>${score_table[rows][boardmetadata[board].STACKSLIST[col]]}</td>`;
             }
             scores_html += '</tr>';
         }
-    
+
         scores_html += '</table>';
+
+        // By Type
+        scores_html += '<h4>By Type</h4>';
+        scores_html += '<table class="table table-striped table-hover table-sm">';
+    
+        // Header Row
+        scores_html += '<tr>';
+        scores_html += '<th>Team</th>';
+        for (let col in boardmetadata[board].LABELS) {
+            scores_html += `<th><span style="color: #${boardmetadata[board].LABELS[col].color};">${col}</span></th>`;
+        }
+        scores_html += '</tr>';
+
+        // Convert Scores to Table Date
+        score_table = {};
+        for (let type in boardmetadata[board].SCORES.TEAMS.BYTYPE) {
+            for (let team in boardmetadata[board].SCORES.TEAMS.BYTYPE[type]) {
+                let teamname = "<span style=\"color: #" + boardmetadata[board].TEAMS[ team ].COLOR + ";\">" + boardmetadata[board].TEAMS[ team ].NAME + "</span>";
+                if (!score_table[teamname]) {
+                    score_table[teamname] = {};
+                }
+                score_table[teamname][type] = boardmetadata[board].SCORES.TEAMS.BYTYPE[type][team];
+            }
+        }
+
+        // console.log(JSON.stringify(score_table, null, 2));
+
+        for (let rows in score_table) {
+            scores_html += '<tr>';
+            scores_html += `<td>${rows}</td>`;
+            for (let col in boardmetadata[board].LABELS) {
+                scores_html += `<td>${score_table[rows][col]}</td>`;
+            }
+            scores_html += '</tr>';
+        }
+
+        scores_html += '</table>';
+
+        scores_html += '<hr>';
+        // By Player
+        scores_html += '<h4>By Player</h4>';
+        scores_html += '<table class="table table-striped table-hover table-sm">';
+    
+        // Header Row
+        scores_html += '<tr>';
+        scores_html += '<th>Team</th>';
+        scores_html += '<th>Player</th>';
+        for (let col in boardmetadata[board].STACKSLIST) {
+            scores_html += `<th>${boardmetadata[board].STACKSLIST[col]}</th>`;
+        }
+        scores_html += '</tr>';
+
+        // Convert Scores to Table Date
+        score_table = [];
+
+        for (let stack in boardmetadata[board].SCORES.PLAYERS.SUMMARY) {
+            for (let player in boardmetadata[board].SCORES.PLAYERS.SUMMARY[stack]) {
+              let team = boardmetadata[board].PEOPLE[player].TEAM_ID;
+              let team_color = boardmetadata[board].TEAMS[team].COLOR;
+              let team_name = boardmetadata[board].TEAMS[team].NAME;
+              let team_display = `<span style="color: #${team_color};">${team_name}</span>`;
+              let player_name = boardmetadata[board].PEOPLE[player].NAME;
+          
+              // Find or create the entry
+              let row = score_table.find(r => r.player === player_name);
+              if (!row) {
+                row = {
+                  team: team_display,
+                  player: player_name,
+                };
+                score_table.push(row);
+              }
+          
+              row[stack] = boardmetadata[board].SCORES.PLAYERS.SUMMARY[stack][player];
+            }
+          }
+
+        // console.log(JSON.stringify(score_table, null, 2));
+
+        for (let row of score_table) {
+            scores_html += `<tr><td>${row.team}</td><td>${row.player}</td>`;
+            for (let col of boardmetadata[board].STACKSLIST) {
+              scores_html += `<td>${row[col] ?? 0}</td>`;
+            }
+            scores_html += '</tr>';
+        }
+
+        // for (let rows in score_table) {
+        //     scores_html += '<tr>';
+        //     scores_html += `<td>${rows}</td>`;
+        //     for (let col in boardmetadata[board].STACKSLIST) {
+        //         scores_html += `<td>${score_table[rows][boardmetadata[board].STACKSLIST[col]]}</td>`;
+        //     }
+        //     scores_html += '</tr>';
+        // }
+
+
+
+
+        scores_html += '</table>';
+
         document.getElementById('scores').innerHTML = scores_html;
+
+    
     }
     
