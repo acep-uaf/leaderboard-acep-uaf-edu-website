@@ -1,6 +1,6 @@
 {
   "name": "infosec-acep-uaf-edu-website",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ACEP InfoSec Website",
   "main": "index.js",
   "type": "module",
