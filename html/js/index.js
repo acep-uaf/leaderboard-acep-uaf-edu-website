@@ -3,29 +3,54 @@
 
 let boardmetadata = {};
 
-fetch('/api/boards')
-    .then(response => response.json())
-    .then(data => {
-        boardmetadata = data;
-        // console.log(JSON.stringify(boardmetadata, null, 2));
+// fetch('/api/boards')
+//     .then(response => response.json())
+//     .then(data => {
+//         boardmetadata = data;
+//         // console.log(JSON.stringify(boardmetadata, null, 2));
 
-        // Select Board to Show
-        let select_html = '';
-        select_html += '<select id="boardselection" onchange="updateScoreboard()">';
-        for (let board in boardmetadata) {
-            select_html += `<option value="${board}">${boardmetadata[board].DESCRIPTION}</option>`;
-        }
-        select_html += '</select>';
-        document.getElementById('selectboard').innerHTML = select_html;
+//         // Select Board to Show
+//         let select_html = '';
+//         select_html += '<select id="boardselection" onchange="updateScoreboard()">';
+//         for (let board in boardmetadata) {
+//             select_html += `<option value="${board}">${boardmetadata[board].DESCRIPTION}</option>`;
+//         }
+//         select_html += '</select>';
+//         document.getElementById('selectboard').innerHTML = select_html;
     
-        // Update Scoreboard
-        updateScoreboard();
+//         // Update Scoreboard
+//         updateScoreboard();
 
-    })
-    .catch(error => {
-        console.error('Error fetching board metadata:', error);
-    });
+//     })
+//     .catch(error => {
+//         console.error('Error fetching board metadata:', error);
+//     });
 
+    updateData(); // initial load
+    setInterval(updateData, 30000); // periodic update
+    
+
+    function updateData() {
+        console.log('Updating Scoreboard...');
+
+        fetch('/api/boards')
+            .then(response => response.json())
+            .then(data => {
+                boardmetadata = data;
+    
+                let select_html = '<select id="boardselection" onchange="updateScoreboard()">';
+                for (let board in boardmetadata) {
+                    select_html += `<option value="${board}">${boardmetadata[board].DESCRIPTION}</option>`;
+                }
+                select_html += '</select>';
+                document.getElementById('selectboard').innerHTML = select_html;
+    
+                updateScoreboard();
+            })
+            .catch(error => {
+                console.error('Error fetching board metadata:', error);
+            });
+    }
 
     function updateScoreboard() {
         // Get Selected Board
